@@ -5,7 +5,7 @@ import matplotlib
 from datetime import datetime
 import os
 
-# 日本語フォント設定（必要に応じて）
+# グラフの日本語表示用フォントを設定
 matplotlib.rcParams['font.family'] = 'Meiryo'  # または 'MS Gothic'
 
 # 銘柄コードと英語ラベル
@@ -43,31 +43,30 @@ with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
         chart_path = os.path.join(target_dir, f"{label}_chart.png")
         plt.figure(figsize=(10, 4))
 
-        # 青線を少し薄くして視認性向上
         plt.plot(df["Datetime"], df["Close"], marker="o", color="blue", alpha=0.6, label="Close")
 
         # 最大値・最小値のインデックス
         max_idx = df["Close"].idxmax()
         min_idx = df["Close"].idxmin()
 
-        # 最大値・最小値の座標
+        # 株価の最大値・最小値を取得
         max_time = df.loc[max_idx, "Datetime"]
         max_price = df.loc[max_idx, "Close"]
         min_time = df.loc[min_idx, "Datetime"]
         min_price = df.loc[min_idx, "Close"]
 
-        # 最大値（赤）のマーカーと数値表示（上に表示）
+        # 最大値をマーカーと数値で表示
         plt.plot(max_time, max_price, marker="o", color="red", markersize=10, label="Max")
         plt.text(max_time, max_price + 5, f"{max_price:.0f}", color="red", fontsize=12, ha="center", va="bottom")
 
-        # 最小値（緑）のマーカーと数値表示（左右にずらして日付と重ならないように）
+        # 最小値をマーカーと数値で表示
         plt.plot(min_time, min_price, marker="o", color="green", markersize=10, label="Min")
         min_ha = "left" if min_idx > len(df) // 2 else "right"
         min_offset = 0.02 * (df["Datetime"].max() - df["Datetime"].min())
         min_x = min_time + min_offset if min_ha == "left" else min_time - min_offset
         plt.text(min_x, min_price, f"{min_price:.0f}", color="green", fontsize=12, ha=min_ha, va="center")
 
-        # 各点に価格ラベル表示（濃いグレー＋フォントサイズUP＋位置調整）
+        # 各時点の終値をグラフ上に表示
         for i in range(len(df)):
             time = df.loc[i, "Datetime"]
             price = df.loc[i, "Close"]
